@@ -1,52 +1,54 @@
+import Contact from "../models/contact.js"
 import HttpError from "../helpers/HttpError.js";
 import { ctrlWrapper } from "../helpers/ctrlWrapper.js";
-import {
-    listContact,
-    getContactById,
-    addContact,
-    removeContact,
-    updateContactById,
-} from "../services/contactsServices.js";
 
 const getAllContacts = async(req, res) => {
-    const result = await listContact();
-    res.json(result)
+    const contacts = await Contact.find();
+    res.send(contacts)
 };
 
-export const getOneContact = async (req, res) => {
+const getOneContact = async (req, res) => {
     const { id } = req.params;
-    const result = await getContactById(id);
+    const contact = await Contact.findById(id);
+    if (!contact) {
+        throw HttpError(404)
+    }
+    res.send(contact);
+};
+
+const deleteContact = async(req, res) => {
+    const { id } = req.params;
+    const result = await Contact.findByIdAndDelete(id);
     if (!result) {
         throw HttpError(404)
     }
-    res.json(result);
-};
-
-export const deleteContact = async(req, res) => {
-    const { id } = req.params;
-    const result = await removeContact(id);
-    if (!result) {
-        throw HttpError(404)
-    }
-    res.json({
+    res.send({
         message: "Delete success",
     })
 };
 
-export const createContact = async (req, res) => {
-    const result = await addContact(req.body);
-    //console.log(result);
-    res.status(201).json(result);
+const createContact = async (req, res) => {
+    const result = await Contact.create(req.body);
+
+    res.send(result);
 };
 
-export const updateContact = async (req, res) => {
+const updateContact = async (req, res) => {
     const { id } = req.params;
-    const result = await updateContactById(id, req.body);
+    const result = await Contact.findByIdAndUpdate(id, req.body,{new: true});
     if (!result) {
         throw HttpError(404) 
     }
     res.json(result);
 };
+const updateStatusContact = async(req,res)=>{
+    const { id } = req.params;
+    const result = await Contact.findByIdAndUpdate(id, req.body,{new: true});
+    if (!result) {
+        throw HttpError(404) 
+    }
+    res.json(result);
+}
 
 const controllers = {
     getAllContacts: ctrlWrapper(getAllContacts),
@@ -54,6 +56,7 @@ const controllers = {
     deleteContact: ctrlWrapper(deleteContact),
     createContact: ctrlWrapper(createContact),
     updateContact: ctrlWrapper(updateContact),
+    updateStatusContact:ctrlWrapper(updateStatusContact),
 };
 
 export default controllers;
