@@ -56,8 +56,8 @@ const logout = async (req, res, next) => {
     res.status(204).end();
 
 };
-async function getAvatar(req, res, next) {
-  try {
+const getAvatar = async (req, res, next) =>{
+
     const user = await User.findById(req.user.id);
 
     if (user === null) {
@@ -69,13 +69,11 @@ async function getAvatar(req, res, next) {
     }
 
     res.sendFile(path.join(process.cwd(), "public/avatars", user.avatar));
-  } catch (error) {
-    next(error);
-  }
+
 }
 
-async function uploadAvatar(req, res, next) {
-  try {
+const uploadAvatar = async (req, res, next)=> {
+
     await fs.rename(
       req.file.path,
       path.join(process.cwd(), "public/avatars", req.file.filename)
@@ -92,9 +90,7 @@ async function uploadAvatar(req, res, next) {
     }
 
     res.send(user);
-  } catch (error) {
-    next(error);
-  }
+
 }
 
 const controllers = { 
