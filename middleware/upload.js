@@ -1,24 +1,19 @@
 import * as path from "node:path";
-import * as crypto from "node:crypto";
-
 import multer from "multer";
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, path.join(process.cwd(), "tmp"));
-  },
-  filename(req, file, cb) {
-    // file.originalname = TrevorPhilips-GTAV.png
-    const extname = path.extname(file.originalname); // .png
-    const basename = path.basename(file.originalname, extname); // TrevorPhilips-GTAV
-    const suffix = crypto.randomUUID();
+import { fileURLToPath } from 'url';
 
-    // const prefix =  crypto.randomUUID();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-    // `${prefix}-${file.originalname}`
-
-    cb(null, `${basename}-${suffix}${extname}`);
-  },
+const multerConfig = multer.diskStorage({
+  destination: path.join(__dirname, "../", "tmp"),
+  filename: (req, file, cb) => {
+    cb(null, file.originalname);
+  }
 });
 
-export default multer({ storage });
+const upload = multer({
+  storage: multerConfig
+});
+
+export default upload;

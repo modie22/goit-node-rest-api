@@ -10,7 +10,6 @@ const usersRouter = express.Router();
 usersRouter.post("/register",  validateBody(registerUserSchema),  controllers.register);
 usersRouter.post("/login",  validateBody(loginUserSchema),  controllers.login);
 usersRouter.get("/logout", auth, controllers.logout);
-usersRouter.get("/avatar", auth ,controllers.getAvatar);
 usersRouter.patch("/avatar", auth , upload.single("avatar"), controllers.uploadAvatar);
 
 export default usersRouter;

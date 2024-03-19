@@ -2,6 +2,8 @@ import User from "../models/user.js";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import gravatar from "gravatar"
+import Jimp from "jimp";
+import { fileURLToPath } from 'url';
 
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
@@ -58,40 +60,36 @@ const logout = async (req, res, next) => {
     res.status(204).end();
 
 };
-const getAvatar = async (req, res, next) =>{
-
-    const user = await User.findById(req.user.id);
-
-    if (user === null) {
-      return res.status(404).send({ message: "User not found" });
-    }
-
-    if (user.avatar === null) {
-      return res.status(404).send({ message: "Avatar not found" });
-    }
-
-    res.sendFile(path.join(process.cwd(), "public/avatars", user.avatar));
-
-}
 
 const uploadAvatar = async (req, res, next)=> {
+  const { id } = req.user;
 
-    await fs.rename(
-      req.file.path,
-      path.join(process.cwd(), "public/avatars", req.file.filename)
-    );
+  const __dirname = path.dirname(fileURLToPath(import.meta.url));
+  const avatarDir = path.join(__dirname, "../", "public", "avatars");
+  const { path: tempUpload, originalname } = req.file;
+  console.log(tempUpload)
+  const filename = `${id}_${originalname}`;
+  await Jimp.read(tempUpload)
+      .then((image) => {
+          return image
+              .resize(250, 250) 
+              .write(filename); 
+      })
+      .catch((err) => {
+          console.error(err);
+      });
+  
+  const resultUpload = path.join(avatarDir, filename);
 
-    const user = await User.findByIdAndUpdate(
-      req.user.id,
-      { avatar: req.file.filename },
-      { new: true }
-    );
+  await fs.rename(tempUpload, resultUpload);
 
-    if (user === null) {
-      return res.status(404).send({ message: "User not found" });
-    }
+  const avatar = path.join("avatars", filename);
 
-    res.send(user);
+  await User.findByIdAndUpdate(id, { avatar });
+
+  res.send({
+      avatar
+  });
 
 }
 
@@ -99,7 +97,6 @@ const controllers = {
   register: ctrlWrapper(register),
   login: ctrlWrapper(login),
   logout:ctrlWrapper(logout),
-  getAvatar:ctrlWrapper(getAvatar),
   uploadAvatar:ctrlWrapper(uploadAvatar),
 };
 
