@@ -1,6 +1,7 @@
 import User from "../models/user.js";
 import * as fs from "node:fs/promises";
 import * as path from "node:path";
+import gravatar from "gravatar"
 
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
@@ -18,6 +19,7 @@ const register = async (req, res) => {
   const result = await User.create({
     email: normalizedEmail,
     password: passwordHash,
+    avatar:gravatar.url(normalizedEmail, {s: '250', r: 'x', d: 'retro'}, false),
     subscription,
   });
   console.log(result);
