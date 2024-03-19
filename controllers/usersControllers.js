@@ -3,7 +3,7 @@ import * as fs from "node:fs/promises";
 import * as path from "node:path";
 import gravatar from "gravatar"
 import Jimp from "jimp";
-import { fileURLToPath } from 'url';
+
 
 import jwt from "jsonwebtoken";
 import HttpError from "../helpers/HttpError.js";
@@ -64,8 +64,7 @@ const logout = async (req, res, next) => {
 const uploadAvatar = async (req, res, next)=> {
   const { id } = req.user;
 
-  const __dirname = path.dirname(fileURLToPath(import.meta.url));
-  const avatarDir = path.join(__dirname, "../", "public", "avatars");
+  const avatarDir = path.join(process.cwd(),  "public", "avatars");
   const { path: tempUpload, originalname } = req.file;
   console.log(tempUpload)
   const filename = `${id}_${originalname}`;
@@ -73,7 +72,7 @@ const uploadAvatar = async (req, res, next)=> {
       .then((image) => {
           return image
               .resize(250, 250) 
-              .write(filename); 
+             .write(tempUpload); 
       })
       .catch((err) => {
           console.error(err);
