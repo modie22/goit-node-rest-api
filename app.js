@@ -6,7 +6,6 @@ import cors from "cors";
 import contactsRouter from "./routes/contactsRouter.js";
 import usersRouter from './routes/usersRouter.js';
 import auth from './middleware/auth.js';
-
 import "./db.js";
 const app = express();
 
