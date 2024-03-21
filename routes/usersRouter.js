@@ -6,10 +6,11 @@ import auth from "../middleware/auth.js";
 import upload from "../middleware/upload.js";
 
 const usersRouter = express.Router();
+const usersAvatarRouter = express.Router();
 
 usersRouter.post("/register",  validateBody(registerUserSchema),  controllers.register);
 usersRouter.post("/login",  validateBody(loginUserSchema),  controllers.login);
 usersRouter.get("/logout", auth, controllers.logout);
-usersRouter.patch("/avatar", auth , upload.single("avatar"), controllers.uploadAvatar);
+
 
 export default usersRouter;
